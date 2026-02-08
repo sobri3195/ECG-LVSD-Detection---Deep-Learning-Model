@@ -63,6 +63,18 @@ interface AugmentationTechnique {
   enabled: boolean;
 }
 
+interface ComprehensiveFeature {
+  id: string;
+  name: string;
+  category: 'Clinical AI' | 'Operations' | 'Compliance' | 'Integration';
+  maturity: 'Pilot' | 'Production' | 'Validated';
+  impact: number;
+  complexity: 'Medium' | 'High' | 'Critical';
+  description: string;
+  capabilities: string[];
+  integration: string;
+}
+
 // ============================================
 // CUSTOM HOOKS
 // ============================================
@@ -171,6 +183,119 @@ const ECG_FEATURES: ECGFeature[] = [
   { name: 'QRS Axis', importance: 0.65, description: 'Mean electrical axis of ventricular depolarization', normalRange: '-30 to +90', unit: 'degrees' },
   { name: 'Heart Rate Variability', importance: 0.63, description: 'Variation in time between consecutive heartbeats', normalRange: '20-100', unit: 'ms' },
   { name: 'Fragmented QRS', importance: 0.58, description: 'Presence of additional deflections in QRS complex', normalRange: 'Absent', unit: 'binary' },
+];
+
+const COMPREHENSIVE_FEATURES: ComprehensiveFeature[] = [
+  {
+    id: 'multimodal',
+    name: 'Multimodal Fusion Engine',
+    category: 'Clinical AI',
+    maturity: 'Validated',
+    impact: 96,
+    complexity: 'Critical',
+    description: 'Menggabungkan EKG, echocardiography summary, dan biomarker untuk prediksi LVSD yang lebih robust.',
+    capabilities: ['Late-fusion attention', 'Missing modality handler', 'Uncertainty calibration'],
+    integration: 'FHIR + DICOM metadata bridge'
+  },
+  {
+    id: 'federated',
+    name: 'Federated Training Coordinator',
+    category: 'Operations',
+    maturity: 'Production',
+    impact: 90,
+    complexity: 'Critical',
+    description: 'Sinkronisasi training lintas rumah sakit tanpa memindahkan data sensitif.',
+    capabilities: ['Secure aggregation', 'Differential privacy', 'Site performance scorecard'],
+    integration: 'VPN edge node + audit logs'
+  },
+  {
+    id: 'drift',
+    name: 'Concept Drift Sentinel',
+    category: 'Clinical AI',
+    maturity: 'Production',
+    impact: 92,
+    complexity: 'High',
+    description: 'Deteksi drift populasi pasien dan perubahan distribusi sinyal secara real-time.',
+    capabilities: ['PSI monitor', 'Alarm thresholding', 'Auto-retraining trigger'],
+    integration: 'Prometheus + alert webhook'
+  },
+  {
+    id: 'fairness',
+    name: 'Fairness & Bias Profiler',
+    category: 'Compliance',
+    maturity: 'Validated',
+    impact: 88,
+    complexity: 'High',
+    description: 'Analisis bias per gender, usia, komorbid, dan lokasi fasilitas kesehatan.',
+    capabilities: ['Subgroup AUC', 'Equalized odds check', 'Mitigation recommendation'],
+    integration: 'Governance dashboard'
+  },
+  {
+    id: 'explainability',
+    name: 'Clinician Explainability Copilot',
+    category: 'Clinical AI',
+    maturity: 'Production',
+    impact: 94,
+    complexity: 'High',
+    description: 'Memberikan alasan prediksi model berbasis lead-level saliency dan aturan klinis.',
+    capabilities: ['Lead saliency map', 'Natural language rationale', 'Counterfactual signal view'],
+    integration: 'EHR note assistant'
+  },
+  {
+    id: 'triage',
+    name: 'Emergency Triage Prioritizer',
+    category: 'Operations',
+    maturity: 'Pilot',
+    impact: 85,
+    complexity: 'High',
+    description: 'Prioritasi pasien berisiko tinggi dengan SLA alert untuk tim jaga.',
+    capabilities: ['Queue stratification', 'Color risk lane', 'Time-to-review tracker'],
+    integration: 'Nurse station monitor'
+  },
+  {
+    id: 'consent',
+    name: 'Dynamic Consent Manager',
+    category: 'Compliance',
+    maturity: 'Production',
+    impact: 83,
+    complexity: 'Medium',
+    description: 'Manajemen persetujuan pasien granular untuk penggunaan data penelitian dan klinis.',
+    capabilities: ['Consent versioning', 'Revocation workflow', 'Policy simulation'],
+    integration: 'Identity provider + legal archive'
+  },
+  {
+    id: 'deployment',
+    name: 'Smart Deployment Orchestrator',
+    category: 'Integration',
+    maturity: 'Validated',
+    impact: 87,
+    complexity: 'High',
+    description: 'Blue/green deployment model dengan fallback otomatis ketika performa menurun.',
+    capabilities: ['Canary rollout', 'Health probing', 'Instant rollback'],
+    integration: 'Kubernetes + service mesh'
+  },
+  {
+    id: 'simulator',
+    name: 'Synthetic Cohort Simulator',
+    category: 'Clinical AI',
+    maturity: 'Pilot',
+    impact: 82,
+    complexity: 'Medium',
+    description: 'Generasi cohort sintetis untuk stress-test model pada skenario langka.',
+    capabilities: ['Demographic balancing', 'Rare case amplification', 'Scenario replay'],
+    integration: 'Research sandbox'
+  },
+  {
+    id: 'reporting',
+    name: 'Regulatory Reporting Generator',
+    category: 'Compliance',
+    maturity: 'Validated',
+    impact: 86,
+    complexity: 'Medium',
+    description: 'Menyusun laporan kepatuhan model untuk komite etik dan regulator.',
+    capabilities: ['Model card export', 'Validation bundle', 'Incident timeline'],
+    integration: 'PDF + JSON evidence package'
+  }
 ];
 
 // ============================================
@@ -465,6 +590,9 @@ const ECGLVSDProjectGenerator: React.FC = () => {
   const [compareModels, setCompareModels] = useState<string[]>([]);
   const [trainingProgress, setTrainingProgress] = useState(0);
   const [isTraining, setIsTraining] = useState(false);
+  const [featureCategoryFilter, setFeatureCategoryFilter] = useState<'All' | ComprehensiveFeature['category']>('All');
+  const [featureMaturityFilter, setFeatureMaturityFilter] = useState<'All' | ComprehensiveFeature['maturity']>('All');
+  const [enabledComprehensiveFeatures, setEnabledComprehensiveFeatures] = useLocalStorage<string[]>('enabledComprehensiveFeatures', []);
 
   const trainingHistory = useMemo(() => generateTrainingHistory(), []);
   const debouncedSearch = useDebounce(searchQuery, 300);
@@ -552,6 +680,46 @@ const ECGLVSDProjectGenerator: React.FC = () => {
       item.name.toLowerCase().includes(debouncedSearch.toLowerCase())
     );
   }, [projectStructure, debouncedSearch]);
+
+  const filteredComprehensiveFeatures = useMemo(() => {
+    return COMPREHENSIVE_FEATURES.filter((feature) => {
+      const categoryMatch = featureCategoryFilter === 'All' || feature.category === featureCategoryFilter;
+      const maturityMatch = featureMaturityFilter === 'All' || feature.maturity === featureMaturityFilter;
+      return categoryMatch && maturityMatch;
+    });
+  }, [featureCategoryFilter, featureMaturityFilter]);
+
+  const comprehensiveInsights = useMemo(() => {
+    const enabledCount = enabledComprehensiveFeatures.length;
+    const avgImpact = COMPREHENSIVE_FEATURES.reduce((acc, feature) => acc + feature.impact, 0) / COMPREHENSIVE_FEATURES.length;
+    const productionReady = COMPREHENSIVE_FEATURES.filter((feature) => feature.maturity !== 'Pilot').length;
+    return { enabledCount, avgImpact, productionReady };
+  }, [enabledComprehensiveFeatures]);
+
+  const toggleComprehensiveFeature = (featureId: string) => {
+    setEnabledComprehensiveFeatures((prev) =>
+      prev.includes(featureId)
+        ? prev.filter((id) => id !== featureId)
+        : [...prev, featureId]
+    );
+  };
+
+  const exportComprehensiveRoadmap = () => {
+    const selectedFeatures = COMPREHENSIVE_FEATURES.filter((feature) => enabledComprehensiveFeatures.includes(feature.id));
+    const payload = {
+      generatedAt: new Date().toISOString(),
+      totalSelected: selectedFeatures.length,
+      selectedFeatures: selectedFeatures.map((feature) => ({
+        name: feature.name,
+        category: feature.category,
+        maturity: feature.maturity,
+        impact: feature.impact,
+        integration: feature.integration
+      }))
+    };
+    console.log('Comprehensive roadmap', payload);
+    showNotificationMsg('Comprehensive roadmap generated. Check console output.');
+  };
 
   // Code content previews
   const codePreviews = useMemo(() => ({
@@ -1136,6 +1304,101 @@ paths:
     </div>
   );
 
+  const renderComprehensiveTab = () => (
+    <div className="space-y-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+          <div>
+            <h3 className="text-xl font-bold text-gray-800 dark:text-white">10 Fitur Baru - Comprehensive Intelligence Suite</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">Pilih modul prioritas untuk roadmap implementasi klinis, operasional, dan compliance.</p>
+          </div>
+          <button
+            onClick={exportComprehensiveRoadmap}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+          >
+            Generate Roadmap
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <p className="text-sm text-gray-600 dark:text-gray-300">Enabled Modules</p>
+            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{comprehensiveInsights.enabledCount}/10</p>
+          </div>
+          <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+            <p className="text-sm text-gray-600 dark:text-gray-300">Average Impact Score</p>
+            <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{comprehensiveInsights.avgImpact.toFixed(1)}</p>
+          </div>
+          <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+            <p className="text-sm text-gray-600 dark:text-gray-300">Production/Validated</p>
+            <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{comprehensiveInsights.productionReady}</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-3 mb-6">
+          <select
+            value={featureCategoryFilter}
+            onChange={(e) => setFeatureCategoryFilter(e.target.value as 'All' | ComprehensiveFeature['category'])}
+            className="px-3 py-2 border dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+          >
+            <option value="All">All Categories</option>
+            <option value="Clinical AI">Clinical AI</option>
+            <option value="Operations">Operations</option>
+            <option value="Compliance">Compliance</option>
+            <option value="Integration">Integration</option>
+          </select>
+          <select
+            value={featureMaturityFilter}
+            onChange={(e) => setFeatureMaturityFilter(e.target.value as 'All' | ComprehensiveFeature['maturity'])}
+            className="px-3 py-2 border dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+          >
+            <option value="All">All Maturity</option>
+            <option value="Pilot">Pilot</option>
+            <option value="Production">Production</option>
+            <option value="Validated">Validated</option>
+          </select>
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          {filteredComprehensiveFeatures.map((feature) => {
+            const isEnabled = enabledComprehensiveFeatures.includes(feature.id);
+            return (
+              <div key={feature.id} className="border dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div>
+                    <h4 className="font-semibold text-gray-800 dark:text-white">{feature.name}</h4>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{feature.category} • {feature.maturity} • {feature.complexity}</p>
+                  </div>
+                  <button
+                    onClick={() => toggleComprehensiveFeature(feature.id)}
+                    className={`px-3 py-1 rounded text-xs font-semibold transition ${
+                      isEnabled ? 'bg-green-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'
+                    }`}
+                  >
+                    {isEnabled ? 'Enabled' : 'Enable'}
+                  </button>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">{feature.description}</p>
+                <div className="space-y-2 mb-3">
+                  {feature.capabilities.map((capability) => (
+                    <div key={capability} className="text-xs text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                      <CheckCircle size={14} className="text-emerald-500" />
+                      <span>{capability}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-500 dark:text-gray-400">Integration: {feature.integration}</span>
+                  <span className="font-semibold text-indigo-600 dark:text-indigo-400">Impact {feature.impact}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Activity },
     { id: 'ecg', label: 'ECG Analysis', icon: Heart },
@@ -1143,6 +1406,7 @@ paths:
     { id: 'training', label: 'Training', icon: TrendingUp },
     { id: 'augmentation', label: 'Augmentation', icon: RefreshCw },
     { id: 'code', label: 'Code', icon: Code },
+    { id: 'comprehensive', label: 'Comprehensive+', icon: Shield },
   ];
 
   return (
@@ -1236,6 +1500,7 @@ paths:
           {activeTab === 'training' && renderTrainingTab()}
           {activeTab === 'augmentation' && renderAugmentationTab()}
           {activeTab === 'code' && renderCodeTab()}
+          {activeTab === 'comprehensive' && renderComprehensiveTab()}
         </div>
 
         {/* Footer */}
