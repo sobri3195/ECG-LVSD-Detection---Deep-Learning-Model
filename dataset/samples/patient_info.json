@@ -1,0 +1,62 @@
+{
+  "dataset_info": {
+    "name": "ECG LVSD Detection Dataset",
+    "version": "1.0.0",
+    "total_patients": 12458,
+    "positive_cases": 3247,
+    "negative_cases": 9211,
+    "sampling_rate_hz": 500,
+    "signal_length_seconds": 10,
+    "num_leads": 12,
+    "created_by": "Lettu Kes dr. Muhammad Sobri Maulana",
+    "institution": "Medical AI Research Lab",
+    "last_updated": "2025-01-20"
+  },
+  "demographics": {
+    "age": {
+      "mean": 58.4,
+      "median": 61.0,
+      "min": 18,
+      "max": 95,
+      "std": 14.2
+    },
+    "gender": {
+      "male": 7226,
+      "female": 5232
+    }
+  },
+  "lvef_distribution": {
+    "severe_lvsd": {
+      "range": "≤ 30%",
+      "count": 1247,
+      "percentage": 10.0
+    },
+    "moderate_lvsd": {
+      "range": "31-40%",
+      "count": 2000,
+      "percentage": 16.1
+    },
+    "mild_lvsd": {
+      "range": "41-50%",
+      "count": 3154,
+      "percentage": 25.3
+    },
+    "normal": {
+      "range": "> 50%",
+      "count": 6057,
+      "percentage": 48.6
+    }
+  },
+  "quality_metrics": {
+    "signal_quality_score": {
+      "excellent": 6842,
+      "good": 4125,
+      "acceptable": 1278,
+      "poor": 213
+    },
+    "noise_level_db": {
+      "mean": -32.5,
+      "std": 4.2
+    }
+  }
+}

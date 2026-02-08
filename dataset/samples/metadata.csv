@@ -1,0 +1,11 @@
+patient_id,age,gender,lvef,diagnosis,risk_score,symptoms,recording_date
+PT-001,65,M,35.0,Dilated Cardiomyopathy,87,Dyspnea;Fatigue;Edema,2024-01-15
+PT-002,58,F,62.0,Normal Sinus Rhythm,12,Asymptomatic,2024-01-16
+PT-003,72,M,28.0,Severe LVSD,95,Chest Pain;Palpitations;Syncope,2024-01-17
+PT-004,45,F,55.0,Borderline LV Function,42,Mild Fatigue,2024-01-18
+PT-005,68,M,32.0,Ischemic Cardiomyopathy,89,Dyspnea;Orthopnea,2024-01-19
+PT-006,52,F,48.0,Mild LV Dysfunction,35,Occasional Fatigue,2024-01-20
+PT-007,71,M,25.0,End-Stage Heart Failure,98,Severe Dyspnea;Edema,2024-01-21
+PT-008,39,M,64.0,Normal LV Function,8,Asymptomatic,2024-01-22
+PT-009,76,F,38.0,Dilated Cardiomyopathy,84,Fatigue;Palpitations,2024-01-23
+PT-010,61,M,52.0,Borderline Normal,28,None,2024-01-24
